@@ -1,4 +1,4 @@
-package org.example.Model
+package org.example.model
 
 enum class TipoCliente {
     REGULAR,

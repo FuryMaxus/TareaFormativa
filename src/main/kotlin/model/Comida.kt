@@ -1,14 +1,13 @@
-package org.example.Model
+package org.example.model
 
 class Comida(nombre: String, precio: Double, categoria: String, tiempoPreparacion: Double, val isPremium: Boolean) : Producto(nombre, precio, categoria,
     tiempoPreparacion
 )
 {
-    override fun recalcularPrecio(): Double {
-        if(this.isPremium) {
-            this.precio += 1000.0
-            return precio
-        }
+    override fun reCalcularPrecio(): Double {
+        val aumento = if (this.isPremium) 1000 else 0
+        this.precio += aumento
+        return precio
     }
 
 }
