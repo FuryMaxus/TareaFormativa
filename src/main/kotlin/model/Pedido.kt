@@ -1,8 +1,9 @@
 package org.example.model
 
 class Pedido(val cliente: Cliente,
-             val listaProductos: List<Producto>,
-             estadoPedido: estadoPedido)
+             val listaProductos: MutableList<Producto>,
+             var estadoPedido: EstadoPedido
+)
 {
     fun calcSumTotal(): Double {
         val suma: Double = this.listaProductos.sumOf { it.precio }

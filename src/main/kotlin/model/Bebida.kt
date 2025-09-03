@@ -1,11 +1,17 @@
 package org.example.model
 
-class Bebida(nombre: String,
+class Bebida(id: Int,
+             nombre: String,
              precio: Double,
              categoria: String,
              tiempoPreparacion: Double,
              val tamaño: TamañoBebida )
-    :Producto(nombre,precio, categoria, tiempoPreparacion)
+    :Producto(
+        id,
+        nombre,
+        precio,
+        categoria,
+        tiempoPreparacion)
 {
     override fun reCalcularPrecio() :Double {
         val aumento: Int = when(this.tamaño){
