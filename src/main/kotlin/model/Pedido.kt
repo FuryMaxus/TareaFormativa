@@ -6,7 +6,7 @@ class Pedido(val cliente: Cliente,
 )
 {
     fun calcSumTotal(): Double {
-        val suma: Double = this.listaProductos.sumOf { it.precio }
+        val suma: Double = this.listaProductos.sumOf { it.reCalcularPrecio() }
         return suma
     }
 

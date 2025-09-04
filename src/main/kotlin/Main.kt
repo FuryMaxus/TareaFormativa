@@ -3,7 +3,6 @@ package org.example
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.example.model.Cliente
-import org.example.model.Comida
 import org.example.model.EstadoPedido
 import org.example.model.Pedido
 import org.example.model.Producto
@@ -62,7 +61,7 @@ fun escogerCategoria(catalogo: List<Producto>,categorias: MutableMap<Int,String>
     val textoOpcionesCategorias: String = builderOpcionesCategorias.toString()
 
     val opcionCategoriaEscogida: Int = pedirDato(textoOpcionesCategorias) {
-        val num = it.toIntOrNull(); it.isNotBlank() && (num in categorias.keys ||num == 0)
+        val num = it.toIntOrNull(); it.isNotBlank() && (num in categorias.keys || num == 0)
     }.toInt()
 
     return opcionCategoriaEscogida
@@ -96,11 +95,6 @@ fun añadirProducto(pedido: Pedido,catalogo: List<Producto>) {
     pedido.listaProductos.add(catalogo[idProducto.toInt()])
 }
 
-fun aplicarDescuentosYpromociones(pedido: Pedido): Double{
-    pedido.listaProductos.forEach { it.precio += it.reCalcularPrecio() }
-    val precioFinal = pedido.calcPrecioTotal()
-    return precioFinal
-}
 
 fun errorPedido(pedido: Pedido){
     pedido.estadoPedido = EstadoPedido.Error("Error en el proceso del pedido")
@@ -117,15 +111,31 @@ suspend fun procesarPedido(pedido: Pedido){
     TODO("Siento que faltan hacer cositas aqui")
 }
 
-fun mostrarDesgloseFinal(pedido: Pedido){
-    val builder: StringBuilder = StringBuilder("Resultado de pedido:\nN°  Id  Nombre  Producto  Precio_Base + Valor_añadido  = Valor_Final")
-    pedido.listaProductos.forEachIndexed { i,producto ->
-        builder.append("${i+1}. ${producto.id} ${producto.nombre} ${producto.categoria}  ${producto.precio}")
-        val valorAñadido = producto.reCalcularPrecio()
-        builder.append("\t${valorAñadido}\t${producto.precio + valorAñadido}")
+fun crearTextoPreciosFinales(pedido: Pedido): String {
+
+    val builderPreciosFinales: StringBuilder = StringBuilder("Id\tNombre\tProducto\t'Valor Base'\t'Valor añadido'\t'Valor Final'\n")
+
+    pedido.listaProductos.forEach { producto ->
+
+        builderPreciosFinales.append("${producto.id}\t${producto.nombre}\t${producto.categoria}\t${producto.precio}")
+        val precioFinal = producto.reCalcularPrecio()
+        builderPreciosFinales.append("\t${precioFinal - producto.precio}\t${precioFinal}\n")
+
     }
-    builder.append("Total en bruto\t Descuento tipo cliente\t IVA\t Precio a pagar\n")
-    TODO("AGREGAR LOS VALORES")
+    val textoPreciosFinales: String = builderPreciosFinales.toString()
+    return textoPreciosFinales
+}
+
+fun mostrarDesgloseFinal(pedido: Pedido){
+
+    val builderDesglose: StringBuilder = StringBuilder("Desglose de pedido:\n")
+    builderDesglose.append(crearTextoPreciosFinales(pedido))
+    builderDesglose.append("Total en bruto\t 'Descuento tipo cliente'\t IVA\t 'Precio a pagar'\n")
+    builderDesglose.append("${pedido.calcSumTotal()}\\t${pedido.calcDescuentoPorTipoCliente()}\\t${pedido.calcPrecioTotal()}")
+
+    val textoDesglose: String = builderDesglose.toString()
+
+    println(textoDesglose)
 }
 
 fun menuPrincipal() {
