@@ -2,11 +2,7 @@ package org.example
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import org.example.model.Cliente
-import org.example.model.EstadoPedido
-import org.example.model.Pedido
-import org.example.model.Producto
-import org.example.model.TipoCliente
+import org.example.model.*
 
 
 fun pedirDato(mensaje: String,
@@ -87,12 +83,15 @@ fun mostrarCatalogo(catalogo: List<Producto>)
 
 fun añadirProducto(pedido: Pedido,catalogo: List<Producto>) {
     print("Ingrese el id del producto que desee agregar a su orden: ")
-    val idProducto: String = readLine()?.trim().orEmpty()
-    if(idProducto.isEmpty()){
+    val idProducto: String = readlnOrNull()?.trim().orEmpty()
+    var existe:Boolean
+    catalogo.forEach{ existe = if (it.id.toString() == idProducto) true else false }
+    if(idProducto.isEmpty() && (!existe)){
         println("No se encontro el producto que ingreso, para ver los productos revise el catalogo")
         return
     }
-    pedido.listaProductos.add(catalogo[idProducto.toInt()])
+    pedido.listaProductos.add(catalogo[idProducto.toInt()-1])
+
 }
 
 
@@ -108,7 +107,6 @@ suspend fun procesarPedido(pedido: Pedido){
     delay(tiempoPreparacion)
     println("Pedido listo para entregar")
     pedido.estadoPedido = EstadoPedido.ListoParaEntrega
-    TODO("Siento que faltan hacer cositas aqui")
 }
 
 fun crearTextoPreciosFinales(pedido: Pedido): String {
@@ -138,9 +136,64 @@ fun mostrarDesgloseFinal(pedido: Pedido){
     println(textoDesglose)
 }
 
-fun menuPrincipal() {
-    TODO("menu con las 5 opciones de la guia")
+suspend fun menuPrincipal(pedido: Pedido, cliente: Cliente, catalogo: List<Producto>): Boolean {
+    when (pedirDato(
+        "Escoja una de las opciones\n" +
+                "0.Salir\n1.Ver catalogo\n2.Agregar Producto\n3.Calcular precios\n4.Procesar pedido\n5.Resumen de operacion"
+    )
+    { it in listOf("0", "1", "2", "3", "4", "5") }) {
+        "0" -> return false
+        "1" -> {
+            mostrarCatalogo(catalogo)
+            return true
+
+        }
+
+        "2" -> {
+
+            añadirProducto(pedido, catalogo)
+            return true
+        }
+
+        "3 " -> {
+            println(crearTextoPreciosFinales(pedido))
+            return true
+        }
+
+        "4" -> {
+            if (pedido.listaProductos.isEmpty()) {
+                println("Pedido vacio")
+            } else {
+                procesarPedido(pedido)
+            }
+            return true
+        }
+
+        "5" -> {
+            if (pedido.listaProductos.isEmpty()) {
+                println("Pedido vacio")
+
+            } else {
+                mostrarDesgloseFinal(pedido)
+            }
+            return false
+        }
+
+    }
+    return false
 }
-fun main() = runBlocking {
-    menuPrincipal()
+
+fun main(): Unit = runBlocking {
+    val cliente: Cliente = pedirDatosCliente()
+    val pedidovacio: Pedido = Pedido(cliente, mutableListOf(),EstadoPedido.Pendiente)
+    val producto1: Bebida = Bebida(1,"coca-cola",3000.56,"gaseosa",1000L,TamañoBebida.MEDIANO)
+    val producto2: Comida = Comida(2,"burger",5000.75,"Comida rapida",5000L,false)
+    val listaProductos = listOf<Producto>(producto1,producto2)
+    do {
+        if (!menuPrincipal(pedidovacio,cliente,listaProductos)){
+            break
+        }
+    }while (true)
+
+
 }

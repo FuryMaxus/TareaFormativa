@@ -1,10 +1,13 @@
 package org.example.model
 
-class Pedido(val cliente: Cliente,
+class Pedido(var cliente: Cliente,
              val listaProductos: MutableList<Producto>,
              var estadoPedido: EstadoPedido
 )
 {
+
+
+
     fun calcSumTotal(): Double {
         val suma: Double = this.listaProductos.sumOf { it.reCalcularPrecio() }
         return suma
