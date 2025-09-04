@@ -4,7 +4,7 @@ class Bebida(id: Int,
              nombre: String,
              precio: Double,
              categoria: String,
-             tiempoPreparacion: Double,
+             tiempoPreparacion: Long,
              val tamaño: TamañoBebida )
     :Producto(
         id,
@@ -19,7 +19,7 @@ class Bebida(id: Int,
             TamañoBebida.MEDIANO -> 200
             TamañoBebida.GRANDE -> 400
         }
-        precio += aumento
-        return precio
+        val precioAumentado = this.precio + aumento
+        return precioAumentado
     }
 }

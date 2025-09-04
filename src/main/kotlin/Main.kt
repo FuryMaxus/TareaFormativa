@@ -3,6 +3,7 @@ package org.example
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.example.model.Cliente
+import org.example.model.Comida
 import org.example.model.EstadoPedido
 import org.example.model.Pedido
 import org.example.model.Producto
@@ -95,8 +96,10 @@ fun añadirProducto(pedido: Pedido,catalogo: List<Producto>) {
     pedido.listaProductos.add(catalogo[idProducto.toInt()])
 }
 
-fun aplicarDescuentosYpromociones(){
-    TODO("Aun no se muy bien a que se refiere esto, deai veo")
+fun aplicarDescuentosYpromociones(pedido: Pedido): Double{
+    pedido.listaProductos.forEach { it.precio += it.reCalcularPrecio() }
+    val precioFinal = pedido.calcPrecioTotal()
+    return precioFinal
 }
 
 fun errorPedido(pedido: Pedido){
@@ -104,18 +107,25 @@ fun errorPedido(pedido: Pedido){
 }
 
 suspend fun procesarPedido(pedido: Pedido){
+
     println("Pedido en preparacion...")
     pedido.estadoPedido = EstadoPedido.EnPreparacion
-    delay(3000L)
+    val tiempoPreparacion: Long = pedido.listaProductos.sumOf { it.tiempoPreparacion }
+    delay(tiempoPreparacion)
     println("Pedido listo para entregar")
     pedido.estadoPedido = EstadoPedido.ListoParaEntrega
     TODO("Siento que faltan hacer cositas aqui")
 }
 
 fun mostrarDesgloseFinal(pedido: Pedido){
-    println("Resultado de pedido:")
-    TODO("No se que datos hay que desglosar aparte de los nombres y precio, supongo que precio total")
-
+    val builder: StringBuilder = StringBuilder("Resultado de pedido:\nN°  Id  Nombre  Producto  Precio_Base + Valor_añadido  = Valor_Final")
+    pedido.listaProductos.forEachIndexed { i,producto ->
+        builder.append("${i+1}. ${producto.id} ${producto.nombre} ${producto.categoria}  ${producto.precio}")
+        val valorAñadido = producto.reCalcularPrecio()
+        builder.append("\t${valorAñadido}\t${producto.precio + valorAñadido}")
+    }
+    builder.append("Total en bruto\t Descuento tipo cliente\t IVA\t Precio a pagar\n")
+    TODO("AGREGAR LOS VALORES")
 }
 
 fun menuPrincipal() {

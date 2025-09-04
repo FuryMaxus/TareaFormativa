@@ -4,7 +4,7 @@ class Comida(id: Int,
              nombre: String,
              precio: Double,
              categoria: String,
-             tiempoPreparacion: Double,
+             tiempoPreparacion: Long,
              val isPremium: Boolean)
     :Producto(
         id,
@@ -16,8 +16,8 @@ class Comida(id: Int,
 {
     override fun reCalcularPrecio(): Double {
         val aumento = if (this.isPremium) 1000 else 0
-        this.precio += aumento
-        return precio
+        val precioAumentado = this.precio + aumento
+        return precioAumentado
     }
 
 }
