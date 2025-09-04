@@ -84,9 +84,15 @@ fun mostrarCatalogo(catalogo: List<Producto>)
 fun añadirProducto(pedido: Pedido,catalogo: List<Producto>) {
     print("Ingrese el id del producto que desee agregar a su orden: ")
     val idProducto: String = readlnOrNull()?.trim().orEmpty()
-    var existe:Boolean
-    catalogo.forEach{ existe = if (it.id.toString() == idProducto) true else false }
-    if(idProducto.isEmpty() && (!existe)){
+    var existe:Boolean = false
+    for (c in catalogo){
+        if (c.id.toString() == idProducto){
+            existe = true
+            break
+        }
+        existe = false
+    }
+    if(idProducto.isEmpty() || (!existe)){
         println("No se encontro el producto que ingreso, para ver los productos revise el catalogo")
         return
     }
@@ -129,7 +135,7 @@ fun mostrarDesgloseFinal(pedido: Pedido){
     val builderDesglose: StringBuilder = StringBuilder("Desglose de pedido:\n")
     builderDesglose.append(crearTextoPreciosFinales(pedido))
     builderDesglose.append("Total en bruto\t 'Descuento tipo cliente'\t IVA\t 'Precio a pagar'\n")
-    builderDesglose.append("${pedido.calcSumTotal()}\\t${pedido.calcDescuentoPorTipoCliente()}\\t${pedido.calcPrecioTotal()}")
+    builderDesglose.append("${pedido.calcSumTotal()}\t${pedido.calcDescuentoPorTipoCliente()}\t${pedido.calcPrecioTotal()}")
 
     val textoDesglose: String = builderDesglose.toString()
 
@@ -145,19 +151,19 @@ suspend fun menuPrincipal(pedido: Pedido, cliente: Cliente, catalogo: List<Produ
         "0" -> return false
         "1" -> {
             mostrarCatalogo(catalogo)
-            return true
+
 
         }
 
         "2" -> {
 
             añadirProducto(pedido, catalogo)
-            return true
+
         }
 
         "3 " -> {
             println(crearTextoPreciosFinales(pedido))
-            return true
+
         }
 
         "4" -> {
@@ -166,7 +172,6 @@ suspend fun menuPrincipal(pedido: Pedido, cliente: Cliente, catalogo: List<Produ
             } else {
                 procesarPedido(pedido)
             }
-            return true
         }
 
         "5" -> {
@@ -180,7 +185,7 @@ suspend fun menuPrincipal(pedido: Pedido, cliente: Cliente, catalogo: List<Produ
         }
 
     }
-    return false
+    return true
 }
 
 fun main(): Unit = runBlocking {
